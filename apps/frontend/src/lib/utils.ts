@@ -3,8 +3,13 @@ export function cn(...classes: (string | undefined | null | false)[]): string {
 }
 
 export function formatDuration(seconds: number): string {
+  // Handle invalid values
+  if (!isFinite(seconds) || seconds < 0 || isNaN(seconds)) {
+    return "0:00";
+  }
+
   const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
+  const secs = Math.floor(seconds % 60);
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
