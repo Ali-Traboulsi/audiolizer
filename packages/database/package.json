@@ -1,0 +1,27 @@
+{
+  "name": "@audiolizer/database",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "db:migrate": "pnpm dlx prisma migrate dev",
+    "db:generate": "pnpm dlx prisma generate",
+    "db:pull": "pnpm dlx prisma db pull",
+    "db:push": "pnpm dlx prisma db push",
+    "db:seed": "pnpm dlx prisma db seed",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "prisma generate"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^6.10.1",
+    "prisma": "^6.10.1"
+  },
+  "exports": {
+    ".": "./index.ts",
+    "./package.json": "./package.json"
+  }
+}

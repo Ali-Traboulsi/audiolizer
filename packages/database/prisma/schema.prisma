@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recordings Recording[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Recording {
+  id          String          @id @default(cuid())
+  userId      String
+  name        String?
+  duration    Int? // in seconds
+  status      RecordingStatus @default(ACTIVE)
+  format      String          @default("webm") // webm, wav, mp3
+  totalSize   Int? // total size in bytes
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  completedAt DateTime?
+
+  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chunks AudioChunk[]
+
+  @@index([userId])
+  @@index([userId, createdAt])
+  @@index([status])
+  @@map("recordings")
+}
+
+enum RecordingStatus {
+  ACTIVE
+  COMPLETED
+  FAILED
+  DELETED
+}
+
+model AudioChunk {
+  id          String   @id @default(cuid())
+  recordingId String
+  chunkIndex  Int
+  audioData   Bytes    @db.LongBlob // Store binary audio data
+  size        Int // size of this chunk in bytes
+  duration    Int? // duration of this chunk in milliseconds
+  timestamp   DateTime @default(now())
+  mimeType    String? // e.g., audio/webm, audio/wav, audio/mp3
+
+  recording Recording @relation(fields: [recordingId], references: [id], onDelete: Cascade)
+
+  @@unique([recordingId, chunkIndex])
+  @@index([recordingId])
+  @@index([recordingId, chunkIndex])
+  @@map("audio_chunks")
+}
