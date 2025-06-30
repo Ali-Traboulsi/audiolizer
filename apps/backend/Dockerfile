@@ -15,10 +15,11 @@ COPY ../../ ./
 RUN npm install
 
 # Build the backend
-RUN npm run backend:build
+WORKDIR /app/apps/backend
+RUN npm run build
 
 # Expose port
 EXPOSE 4000
 
 # Start the application
-CMD ["npm", "run", "backend:start"]
+CMD ["npm", "run", "start:prod"]
