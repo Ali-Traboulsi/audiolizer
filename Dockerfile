@@ -2,17 +2,25 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files first (better caching)
 COPY package*.json ./
 COPY pnpm-lock.yaml* ./
 
-# Copy all source code
-COPY . .
+# Copy backend package.json
+COPY apps/backend/package*.json ./apps/backend/
 
-# Install dependencies
+# Install root dependencies
 RUN npm install
 
-# Build backend
+# Install backend dependencies specifically
+WORKDIR /app/apps/backend
+RUN npm install
+
+# Go back to root and copy source code
+WORKDIR /app
+COPY . .
+
+# Build backend (now nest CLI will be available)
 RUN npm run backend:build
 
 # Expose port
