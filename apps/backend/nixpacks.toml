@@ -1,0 +1,17 @@
+[phases.setup]
+nixPkgs = ['nodejs_18', 'python3']
+
+[phases.install]
+cmds = [
+  'cd ../..',
+  'npm install'
+]
+
+[phases.build]
+cmds = [
+  'cd ../..',
+  'npm run build --workspace=apps/backend'
+]
+
+[start]
+cmd = 'cd ../.. && npm run start:prod --workspace=apps/backend'

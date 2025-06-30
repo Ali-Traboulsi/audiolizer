@@ -12,12 +12,14 @@ import {
   UseInterceptors,
   UseGuards,
   Request,
+  Logger,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RecordingService } from './recording.service';
 import { CreateRecordingDto, UploadChunkDto } from './Dto/recording.dto';
 import { Express, Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 
 @Controller('recordings')
 @UseGuards(AuthGuard('jwt'))
@@ -198,39 +200,45 @@ export class RecordingController {
   }
 
   // Debug endpoint to check recording chunks
-  @Get(':id/debug')
-  async debugRecording(@Request() req, @Param('id') recordingId: string) {
-    const recording = await this.recordingService.getRecording(
-      recordingId,
-      req.user.id,
-    );
+  @Get('debug')
+  async debugRecording(
+    @CurrentUser() currentUser,
+    // @Param('id') recordingId: string,
+  ) {
+    // const recording = await this.recordingService.getRecording(
+    //   recordingId,
+    //   req.user.id,
+    // );
 
-    const chunks = await this.recordingService.getRecordingChunks(
-      recordingId,
-      req.user.id,
-    );
+    // const chunks = await this.recordingService.getRecordingChunks(
+    //   recordingId,
+    //   req.user.id,
+    // );
+
+    Logger.log(`Debugging recording for user ${currentUser.id}`);
 
     return {
       success: true,
       data: {
-        recording: {
-          id: recording.id,
-          name: recording.name,
-          status: recording.status,
-          duration: recording.duration,
-          format: recording.format,
-          totalSize: recording.totalSize,
-          chunksCount: recording.chunks?.length || 0,
-        },
-        chunks: chunks.map((chunk) => ({
-          id: chunk.id,
-          chunkIndex: chunk.chunkIndex,
-          size: chunk.size,
-          mimeType: chunk.mimeType,
-          hasAudioData: !!chunk.audioData && chunk.audioData.length > 0,
-        })),
-        totalChunks: chunks.length,
-        totalSize: chunks.reduce((sum, chunk) => sum + chunk.size, 0),
+        currentUser: currentUser,
+        //   recording: {
+        //     id: recording.id,
+        //     name: recording.name,
+        //     status: recording.status,
+        //     duration: recording.duration,
+        //     format: recording.format,
+        //     totalSize: recording.totalSize,
+        //     chunksCount: recording.chunks?.length || 0,
+        //   },
+        //   chunks: chunks.map((chunk) => ({
+        //     id: chunk.id,
+        //     chunkIndex: chunk.chunkIndex,
+        //     size: chunk.size,
+        //     mimeType: chunk.mimeType,
+        //     hasAudioData: !!chunk.audioData && chunk.audioData.length > 0,
+        //   })),
+        //   totalChunks: chunks.length,
+        //   totalSize: chunks.reduce((sum, chunk) => sum + chunk.size, 0),
       },
     };
   }
