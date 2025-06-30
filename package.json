@@ -5,7 +5,9 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "backend:build": "cd apps/backend && npm run build",
+    "backend:start": "cd apps/backend && npm run start:prod",
     "frontend:build": "cd apps/frontend && npm run build",
+    "frontend:start": "cd apps/frontend && npm run start",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "clean": "rm -rf .next node_modules package-lock.json yarn.lock pnpm-lock.yaml && pnpm i"
   },
