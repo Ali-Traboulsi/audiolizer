@@ -4,25 +4,21 @@ WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-COPY pnpm-lock.yaml* ./
 COPY apps/backend/package*.json ./apps/backend/
+COPY packages/database/ ./packages/database/
 
 # Install dependencies
 RUN npm install
 RUN cd apps/backend && npm install
 
-# Copy database schema and generate client
-COPY packages/database/ ./packages/database/
-RUN cd packages/database && npx prisma generate
-
-# Copy backend source
+# Copy source code
 COPY apps/backend/ ./apps/backend/
 
-# Build backend
+# Build (prebuild will generate Prisma)
 RUN cd apps/backend && npm run build
 
 # Expose port
 EXPOSE 4000
 
 # Start backend
-CMD ["cd", "apps/backend", "&&", "npm", "run", "start:prod"]
+CMD ["sh", "-c", "cd apps/backend && npm run start:prod"]
