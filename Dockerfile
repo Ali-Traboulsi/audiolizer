@@ -2,29 +2,27 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files first (better caching)
+# Copy package files
 COPY package*.json ./
 COPY pnpm-lock.yaml* ./
-
-# Copy backend package.json
 COPY apps/backend/package*.json ./apps/backend/
 
-# Install root dependencies
+# Install dependencies
 RUN npm install
+RUN cd apps/backend && npm install
 
-# Install backend dependencies specifically
-WORKDIR /app/apps/backend
-RUN npm install
+# Copy database schema and generate client
+COPY packages/database/ ./packages/database/
+RUN cd packages/database && npx prisma generate
 
-# Go back to root and copy source code
-WORKDIR /app
-COPY . .
+# Copy backend source
+COPY apps/backend/ ./apps/backend/
 
-# Build backend (now nest CLI will be available)
-RUN npm run backend:build
+# Build backend
+RUN cd apps/backend && npm run build
 
 # Expose port
 EXPOSE 4000
 
 # Start backend
-CMD ["npm", "run", "backend:start"]
+CMD ["cd", "apps/backend", "&&", "npm", "run", "start:prod"]
