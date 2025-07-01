@@ -14,7 +14,7 @@ RUN npm install
 RUN cd apps/backend && npm install
 
 # Install database dependencies (for Prisma CLI)
-RUN cd ../../packages/database && npm install
+RUN cd packages/database && npm install
 
 # Copy database schema
 COPY packages/database/ ./packages/database/
